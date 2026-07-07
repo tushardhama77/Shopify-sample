@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keystroke One — Basalt Keyboards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15161B;
+    --panel:#1E2027;
+    --panel-alt:#24262E;
+    --text:#ECE8E1;
+    --text-muted:#9B9CA6;
+    --accent-key:#F5C518;
+    --accent-key-dim:#4a4020;
+    --accent-switch:#3ECFB2;
+    --border:#33343C;
+    --radius:10px;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  button{font-family:inherit; cursor:pointer; border:none;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent-switch);
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:''; width:16px; height:1px; background:var(--accent-switch);}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(21,22,27,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px;
+  }
+  .logo{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:20px; letter-spacing:0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo-mark{
+    width:22px; height:22px; border-radius:5px;
+    background:var(--accent-key);
+    display:inline-block;
+  }
+  .nav-links{display:flex; gap:32px; font-size:14px; color:var(--text-muted);}
+  .nav-links a{transition:color .15s;}
+  .nav-links a:hover, .nav-links a:focus-visible{color:var(--text);}
+  .nav-right{display:flex; align-items:center; gap:20px;}
+  .cart-btn{
+    position:relative; background:none; color:var(--text);
+    display:flex; align-items:center; gap:6px; font-size:14px;
+    padding:8px; border-radius:8px;
+  }
+  .cart-btn:hover, .cart-btn:focus-visible{background:var(--panel);}
+  .cart-count{
+    position:absolute; top:-4px; right:-4px;
+    background:var(--accent-key); color:#15161B;
+    font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace;
+    width:18px; height:18px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transform:scale(0); transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .cart-count.show{transform:scale(1);}
+  .menu-toggle{display:none; background:none; color:var(--text); font-size:20px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:64px 0 40px;
+    display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;
+  }
+  .hero h1{
+    font-size:clamp(34px, 4.2vw, 52px);
+    line-height:1.08; margin:18px 0 18px;
+    font-weight:600; letter-spacing:-0.01em;
+  }
+  .hero p.sub{color:var(--text-muted); font-size:16px; max-width:44ch; margin-bottom:26px;}
+  .rating-row{display:flex; align-items:center; gap:10px; margin-bottom:22px;}
+  .stars{color:var(--accent-key); letter-spacing:2px; font-size:15px;}
+  .rating-row span{color:var(--text-muted); font-size:13px;}
+  .price-row{display:flex; align-items:baseline; gap:12px; margin-bottom:24px;}
+  .price{font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:700;}
+  .price-was{color:var(--text-muted); text-decoration:line-through; font-size:15px; font-family:'JetBrains Mono',monospace;}
+
+  .variant-block{margin-bottom:22px;}
+  .variant-label{font-size:13px; color:var(--text-muted); margin-bottom:10px; display:block;}
+  .variant-label b{color:var(--text); font-weight:600;}
+  .swatches{display:flex; gap:10px;}
+  .swatch{
+    width:38px; height:38px; border-radius:50%;
+    border:2px solid transparent; cursor:pointer;
+    position:relative; transition:transform .15s, border-color .15s;
+  }
+  .swatch:hover{transform:translateY(-2px);}
+  .swatch[aria-pressed="true"]{border-color:var(--accent-key);}
+  .swatch[aria-pressed="true"]::after{
+    content:''; position:absolute; inset:-6px; border:1px solid var(--accent-key); border-radius:50%;
+  }
+  .sw-graphite{background:#3a3c44;}
+  .sw-parchment{background:#e4dcc8;}
+  .sw-moss{background:#5c6b52;}
+
+  .buy-row{display:flex; gap:12px; align-items:center; margin-bottom:22px;}
+  .qty{
+    display:flex; align-items:center; border:1px solid var(--border); border-radius:8px; overflow:hidden;
+  }
+  .qty button{background:var(--panel); color:var(--text); width:36px; height:44px; font-size:16px;}
+  .qty button:hover{background:var(--panel-alt);}
+  .qty span{width:36px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:15px;}
+  .btn-primary{
+    background:var(--accent-switch); color:#0e1613; font-weight:600; font-size:15px;
+    padding:0 28px; height:44px; border-radius:8px; flex:1;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:filter .15s, transform .1s;
+  }
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-primary:active{transform:scale(.98);}
+
+  .trust-mini{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:var(--text-muted);}
+  .trust-mini span{display:flex; align-items:center; gap:6px;}
+  .dot{width:4px; height:4px; border-radius:50%; background:var(--accent-switch); display:inline-block;}
+
+  /* ---------- hero keycap visual (signature element) ---------- */
+  .keeb-stage{
+    background:linear-gradient(160deg, var(--panel) 0%, #1a1c22 100%);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:36px 30px 26px;
+  }
+  .keeb{display:flex; flex-direction:column; gap:8px; user-select:none;}
+  .krow{display:flex; gap:8px; justify-content:center;}
+  .key{
+    height:38px; min-width:38px; flex:1 1 38px; max-width:52px;
+    background:#2b2d35;
+    border-radius:6px;
+    border-bottom:3px solid #17181d;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted);
+    cursor:pointer;
+    transition:transform .06s ease, border-bottom-width .06s ease, background .15s, color .15s;
+  }
+  .key.wide{flex:2.6 1 auto; max-width:none;}
+  .key.accent{background:#3a3419; color:var(--accent-key); border-bottom-color:#7a6416;}
+  .key:hover{background:#34363f; color:var(--text);}
+  .key:active, .key.pressed{
+    transform:translateY(2px);
+    border-bottom-width:1px;
+  }
+  .keeb-caption{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:20px; font-size:12px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;
+  }
+  .keeb-caption .count{color:var(--accent-key);}
+
+  /* ---------- trust strip ---------- */
+  .trust-strip{
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:28px 0;
+  }
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; text-align:center;}
+  .trust-grid div{font-size:13px; color:var(--text-muted);}
+  .trust-grid strong{display:block; color:var(--text); font-size:14px; margin-bottom:4px; font-family:'Space Grotesk',sans-serif;}
+
+  /* ---------- section shell ---------- */
+  section{padding:72px 0;}
+  .section-head{margin-bottom:36px;}
+  .section-head h2{font-size:28px; font-weight:600; margin-top:10px;}
+
+  /* ---------- details ---------- */
+  .details-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:60px;}
+  .details-grid p{color:var(--text-muted); margin-bottom:16px; font-size:15px;}
+  .specs{border-top:1px solid var(--border);}
+  .spec-row{
+    display:flex; justify-content:space-between; padding:14px 0;
+    border-bottom:1px solid var(--border); font-size:14px;
+  }
+  .spec-row span:first-child{color:var(--text-muted);}
+  .spec-row span:last-child{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- reviews ---------- */
+  .review-summary{
+    display:flex; gap:40px; align-items:center; margin-bottom:40px;
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:28px;
+  }
+  .review-score{text-align:center; min-width:100px;}
+  .review-score .big{font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:700;}
+  .bars{flex:1; display:flex; flex-direction:column; gap:6px;}
+  .bar-row{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-muted);}
+  .bar-track{flex:1; height:6px; background:var(--panel-alt); border-radius:4px; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--accent-key);}
+  .review-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .review-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:22px;
+  }
+  .review-card .stars{margin-bottom:12px; display:block;}
+  .review-card p{color:var(--text-muted); font-size:14px; margin-bottom:14px;}
+  .review-card .who{font-size:13px; font-weight:600;}
+  .review-card .who span{color:var(--text-muted); font-weight:400;}
+
+  /* ---------- cross-sell ---------- */
+  .addon-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .addon-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:22px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .addon-swatch{height:90px; border-radius:8px; background:var(--panel-alt); position:relative; overflow:hidden;}
+  .addon-swatch::after{
+    content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(135deg, transparent 0 10px, rgba(255,255,255,.03) 10px 20px);
+  }
+  .addon-title{font-weight:600; font-size:14.5px;}
+  .addon-price{font-family:'JetBrains Mono',monospace; color:var(--text-muted); font-size:13px;}
+  .btn-secondary{
+    background:transparent; border:1px solid var(--border); color:var(--text);
+    padding:9px 0; border-radius:7px; font-size:13.5px; font-weight:500;
+    transition:border-color .15s, background .15s;
+  }
+  .btn-secondary:hover{border-color:var(--accent-switch); background:var(--panel-alt);}
+
+  /* ---------- newsletter ---------- */
+  .newsletter{
+    background:var(--panel); border:1px solid var(--border); border-radius:16px;
+    padding:44px; text-align:center;
+  }
+  .newsletter h3{font-size:22px; margin-bottom:10px;}
+  .newsletter p{color:var(--text-muted); font-size:14px; margin-bottom:24px;}
+  .nl-form{display:flex; gap:10px; max-width:420px; margin:0 auto;}
+  .nl-form input{
+    flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    padding:0 14px; height:44px; color:var(--text); font-size:14px;
+  }
+  .nl-form input:focus-visible{outline:2px solid var(--accent-switch); outline-offset:1px;}
+  .nl-form button{
+    background:var(--accent-key); color:#15161B; font-weight:600; font-size:14px;
+    padding:0 22px; border-radius:8px;
+  }
+  .nl-msg{font-size:13px; margin-top:14px; min-height:18px; color:var(--accent-switch);}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border); padding:48px 0 30px;}
+  .foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:30px; margin-bottom:36px;}
+  .foot-col h4{font-size:13px; margin-bottom:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em;}
+  .foot-col a{display:block; font-size:14px; color:var(--text); margin-bottom:10px; opacity:.85;}
+  .foot-col a:hover{opacity:1; color:var(--accent-switch);}
+  .foot-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:24px; border-top:1px solid var(--border);
+    font-size:12.5px; color:var(--text-muted);
+  }
+
+  /* ---------- sticky mobile bar ---------- */
+  .sticky-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:var(--panel); border-top:1px solid var(--border);
+    padding:12px 18px; display:flex; align-items:center; gap:14px;
+    transform:translateY(100%); transition:transform .25s ease;
+  }
+  .sticky-bar.show{transform:translateY(0);}
+  .sticky-bar .price{font-size:16px;}
+  .sticky-bar .btn-primary{height:40px;}
+
+  .toast{
+    position:fixed; top:80px; right:24px; z-index:80;
+    background:var(--accent-switch); color:#0e1613; font-weight:600; font-size:14px;
+    padding:12px 18px; border-radius:8px;
+    transform:translateX(140%); transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .toast.show{transform:translateX(0);}
+
+  @media (max-width:860px){
+    .nav-links{display:none;}
+    .menu-toggle{display:block;}
+    .hero{grid-template-columns:1fr; padding-top:36px; gap:36px;}
+    .keeb-stage{order:-1;}
+    .trust-grid{grid-template-columns:repeat(2,1fr); row-gap:20px;}
+    .details-grid{grid-template-columns:1fr; gap:36px;}
+    .review-cards{grid-template-columns:1fr;}
+    .review-summary{flex-direction:column; align-items:flex-start; gap:20px;}
+    .addon-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+    .toast{right:12px; left:12px; top:70px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav wrap">
+    <div class="logo"><span class="logo-mark"></span>BASALT</div>
+    <div class="nav-links">
+      <a href="#">Keyboards</a>
+      <a href="#details">Details</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#addons">Accessories</a>
+    </div>
+    <div class="nav-right">
+      <button class="menu-toggle" aria-label="Open menu">☰</button>
+      <button class="cart-btn" id="cartBtn" aria-label="Cart">
+        🛒 <span class="cart-count mono" id="cartCount">0</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" style="padding-bottom:0;">
+    <div>
+      <span class="eyebrow">Keystroke One — 75% Mechanical</span>
+      <h1>Built for people<br>who type for a living.</h1>
+      <p class="sub">Hot-swappable switches, a gasket-mounted case, and PBT keycaps tuned for long writing and coding sessions — not just unboxing photos.</p>
+
+      <div class="rating-row">
+        <span class="stars mono">★★★★★</span>
+        <span>4.8 from 312 reviews</span>
+      </div>
+
+      <div class="price-row">
+        <span class="price" id="priceDisplay">₹6,499</span>
+        <span class="price-was">₹7,999</span>
+      </div>
+
+      <div class="variant-block">
+        <span class="variant-label">Colorway: <b id="variantName">Graphite</b></span>
+        <div class="swatches" role="group" aria-label="Choose colorway">
+          <button class="swatch sw-graphite" aria-pressed="true" data-name="Graphite" aria-label="Graphite"></button>
+          <button class="swatch sw-parchment" aria-pressed="false" data-name="Parchment" aria-label="Parchment"></button>
+          <button class="swatch sw-moss" aria-pressed="false" data-name="Moss" aria-label="Moss"></button>
+        </div>
+      </div>
+
+      <div class="buy-row">
+        <div class="qty">
+          <button id="qtyMinus" aria-label="Decrease quantity">–</button>
+          <span id="qtyVal" class="mono">1</span>
+          <button id="qtyPlus" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn-primary" id="addToCart">Add to cart</button>
+      </div>
+
+      <div class="trust-mini">
+        <span><i class="dot"></i>Free shipping over ₹2,999</span>
+        <span><i class="dot"></i>2-year warranty</span>
+        <span><i class="dot"></i>30-day trial</span>
+      </div>
+    </div>
+
+    <div class="keeb-stage" id="heroStage">
+      <div class="keeb" id="keeb"></div>
+      <div class="keeb-caption">
+        <span>Every key is a real switch. Try it.</span>
+        <span>keystrokes counted: <span class="count mono" id="keyCount">0</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <section class="trust-strip" style="padding-top:44px;">
+    <div class="trust-grid">
+      <div><strong>Free shipping</strong>On orders over ₹2,999</div>
+      <div><strong>Hot-swap sockets</strong>No soldering to change switches</div>
+      <div><strong>2-year warranty</strong>Covers switches &amp; PCB</div>
+      <div><strong>30-day trial</strong>Full refund, no questions</div>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section id="details">
+    <div class="section-head">
+      <span class="eyebrow">Details</span>
+      <h2>Made to disappear under your hands</h2>
+    </div>
+    <div class="details-grid">
+      <div>
+        <p>Keystroke One uses a gasket-mount design, so the plate flexes slightly with every press instead of bottoming out hard against the case. Combined with foam dampening, typing sounds rounded and deep rather than clacky.</p>
+        <p>Every switch socket is hot-swappable, so you can move from a linear to a tactile feel in about ten minutes with the included puller — no soldering iron required.</p>
+        <p>The 75% layout keeps arrow keys and a function row while cutting the numpad, so it fits in a bag without losing the keys people actually reach for.</p>
+      </div>
+      <div class="specs">
+        <div class="spec-row"><span>Layout</span><span>75%, 84 keys</span></div>
+        <div class="spec-row"><span>Switches</span><span>Hot-swap, 5-pin</span></div>
+        <div class="spec-row"><span>Keycaps</span><span>PBT, dye-sublimated</span></div>
+        <div class="spec-row"><span>Connectivity</span><span>USB-C / Bluetooth 5.0</span></div>
+        <div class="spec-row"><span>Battery</span><span>4000 mAh · ~40 days</span></div>
+        <div class="spec-row"><span>Weight</span><span>820 g</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section id="reviews">
+    <div class="section-head">
+      <span class="eyebrow">Reviews</span>
+      <h2>What people who actually type all day think</h2>
+    </div>
+
+    <div class="review-summary">
+      <div class="review-score">
+        <div class="big mono">4.8</div>
+        <div class="stars mono">★★★★★</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">312 reviews</div>
+      </div>
+      <div class="bars">
+        <div class="bar-row"><span style="width:16px;">5</span><div class="bar-track"><div class="bar-fill" style="width:78%;"></div></div><span>78%</span></div>
+        <div class="bar-row"><span style="width:16px;">4</span><div class="bar-track"><div class="bar-fill" style="width:14%;"></div></div><span>14%</span></div>
+        <div class="bar-row"><span style="width:16px;">3</span><div class="bar-track"><div class="bar-fill" style="width:5%;"></div></div><span>5%</span></div>
+        <div class="bar-row"><span style="width:16px;">2</span><div class="bar-track"><div class="bar-fill" style="width:2%;"></div></div><span>2%</span></div>
+        <div class="bar-row"><span style="width:16px;">1</span><div class="bar-track"><div class="bar-fill" style="width:1%;"></div></div><span>1%</span></div>
+      </div>
+    </div>
+
+    <div class="review-cards">
+      <div class="review-card">
+        <span class="stars mono">★★★★★</span>
+        <p>"Swapped my switches to tactiles on day two, took maybe eight minutes. First board I've kept on my desk past a month."</p>
+        <div class="who">Priya K. <span>· Verified buyer</span></div>
+      </div>
+      <div class="review-card">
+        <span class="stars mono">★★★★★</span>
+        <p>"The gasket mount actually matters — my wrists don't ache after long debugging sessions anymore."</p>
+        <div class="who">Arjun M. <span>· Verified buyer</span></div>
+      </div>
+      <div class="review-card">
+        <span class="stars mono">★★★★☆</span>
+        <p>"Sound is great out of the box. Battery easily gets me through two work weeks on Bluetooth."</p>
+        <div class="who">Sana R. <span>· Verified buyer</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADDONS -->
+  <section id="addons">
+    <div class="section-head">
+      <span class="eyebrow">Complete the setup</span>
+      <h2>Frequently added together</h2>
+    </div>
+    <div class="addon-grid">
+      <div class="addon-card">
+        <div class="addon-swatch"></div>
+        <div>
+          <div class="addon-title">Switch Tester — 12 way</div>
+          <div class="addon-price mono">₹899</div>
+        </div>
+        <button class="btn-secondary addon-add">Add to cart</button>
+      </div>
+      <div class="addon-card">
+        <div class="addon-swatch"></div>
+        <div>
+          <div class="addon-title">Memory Foam Wrist Rest</div>
+          <div class="addon-price mono">₹1,299</div>
+        </div>
+        <button class="btn-secondary addon-add">Add to cart</button>
+      </div>
+      <div class="addon-card">
+        <div class="addon-swatch"></div>
+        <div>
+          <div class="addon-title">Keycap &amp; Switch Puller</div>
+          <div class="addon-price mono">₹349</div>
+        </div>
+        <button class="btn-secondary addon-add">Add to cart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section>
+    <div class="newsletter">
+      <h3>Get ₹500 off your first order</h3>
+      <p>Restock alerts and new colorways, nothing else.</p>
+      <form class="nl-form" id="nlForm">
+        <input type="email" placeholder="you@email.com" required aria-label="Email address" id="nlEmail">
+        <button type="submit">Subscribe</button>
+      </form>
+      <div class="nl-msg" id="nlMsg"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <div class="logo" style="margin-bottom:12px;"><span class="logo-mark"></span>BASALT</div>
+        <p style="color:var(--text-muted); font-size:13.5px; max-width:32ch;">Keyboards built for the hours you actually spend typing, not the unboxing video.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Shop</h4>
+        <a href="#">Keyboards</a>
+        <a href="#">Switches</a>
+        <a href="#addons">Accessories</a>
+      </div>
+      <div class="foot-col">
+        <h4>Support</h4>
+        <a href="#">Shipping &amp; returns</a>
+        <a href="#">Warranty</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Basalt Keyboards. Concept work sample — not a live store.</span>
+      <span class="mono">Built by Tushar Dhama</span>
+    </div>
+  </div>
+</footer>
+
+<div class="sticky-bar" id="stickyBar">
+  <span class="price mono">₹6,499</span>
+  <button class="btn-primary" id="stickyAdd">Add to cart</button>
+</div>
+
+<div class="toast" id="toast">Added to cart</div>
+
+<script>
+  // ---- keyboard rows for the hero (QWERTY-ish 75% layout, condensed) ----
+  const rows = [
+    ["Esc","1","2","3","4","5","6","7","8","9","0","–","="],
+    ["Tab","Q","W","E","R","T","Y","U","I","O","P","[","]"],
+    ["Caps","A","S","D","F","G","H","J","K","L",";","'"],
+    ["Shift","Z","X","C","V","B","N","M",",",".","/"],
+    ["Ctrl","Alt","Space","Alt","Ctrl"]
+  ];
+  const accentKeys = new Set(["B","A","S","A","L","T"]); // playful nod to brand
+  const keeb = document.getElementById('keeb');
+  let accentUsed = 0;
+  rows.forEach(row=>{
+    const rowEl = document.createElement('div');
+    rowEl.className = 'krow';
+    row.forEach(label=>{
+      const k = document.createElement('button');
+      k.className = 'key';
+      k.type = 'button';
+      k.textContent = label;
+      if(label === 'Space') k.classList.add('wide');
+      if(accentKeys.has(label) && accentUsed < 6){ k.classList.add('accent'); accentUsed++; }
+      keeb.appendChild(k);
+      rowEl.appendChild(k);
+    });
+    keeb.appendChild(rowEl);
+  });
+
+  let keystrokes = 0;
+  const keyCountEl = document.getElementById('keyCount');
+  keeb.addEventListener('click', (e)=>{
+    const key = e.target.closest('.key');
+    if(!key) return;
+    key.classList.add('pressed');
+    setTimeout(()=>key.classList.remove('pressed'), 120);
+    keystrokes++;
+    keyCountEl.textContent = keystrokes;
+  });
+
+  // ---- variant swatches ----
+  const swatches = document.querySelectorAll('.swatch');
+  const variantName = document.getElementById('variantName');
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.setAttribute('aria-pressed','false'));
+      sw.setAttribute('aria-pressed','true');
+      variantName.textContent = sw.dataset.name;
+    });
+  });
+
+  // ---- quantity ----
+  let qty = 1;
+  const qtyVal = document.getElementById('qtyVal');
+  document.getElementById('qtyPlus').addEventListener('click', ()=>{
+    qty = Math.min(qty+1, 10);
+    qtyVal.textContent = qty;
+  });
+  document.getElementById('qtyMinus').addEventListener('click', ()=>{
+    qty = Math.max(qty-1, 1);
+    qtyVal.textContent = qty;
+  });
+
+  // ---- cart + toast ----
+  let cartTotal = 0;
+  const cartCount = document.getElementById('cartCount');
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), 1800);
+  }
+  function addToCart(count, msg){
+    cartTotal += count;
+    cartCount.textContent = cartTotal;
+    cartCount.classList.add('show');
+    showToast(msg);
+  }
+  document.getElementById('addToCart').addEventListener('click', ()=>{
+    addToCart(qty, `Added ${qty} × Keystroke One (${variantName.textContent})`);
+  });
+  document.getElementById('stickyAdd').addEventListener('click', ()=>{
+    addToCart(qty, `Added ${qty} × Keystroke One (${variantName.textContent})`);
+  });
+  document.querySelectorAll('.addon-add').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const title = btn.closest('.addon-card').querySelector('.addon-title').textContent;
+      addToCart(1, `Added ${title}`);
+    });
+  });
+
+  // ---- sticky mobile bar ----
+  const stickyBar = document.getElementById('stickyBar');
+  const heroStage = document.getElementById('heroStage');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(window.innerWidth <= 860){
+        stickyBar.classList.toggle('show', !entry.isIntersecting);
+      }
+    });
+  }, {threshold:0});
+  io.observe(heroStage);
+
+  // ---- newsletter ----
+  const nlForm = document.getElementById('nlForm');
+  const nlMsg = document.getElementById('nlMsg');
+  nlForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('nlEmail').value;
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    nlMsg.textContent = valid ? "You're on the list — check your inbox for the code." : "That email doesn't look right — try again.";
+    nlMsg.style.color = valid ? 'var(--accent-switch)' : '#e07a5f';
+    if(valid) nlForm.reset();
+  });
+</script>
+
+</body>
+</html>
